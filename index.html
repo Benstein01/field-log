@@ -262,7 +262,7 @@
   </div>
 
   <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/library/d/1FBAPXCfkKkmwWnTEmuFB7vrtvgOTRvDQPpRKX-E8N2piat7i-TqMhgh8/2";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwDfHWz9rb-rP-InF9eZr_-Q_kvMeEPlJwBvQ7JRACHs97KZ-qwUE_enHuOpGfnbJq6/exec";
 
     const MEMBERS = [
       "A. Hadjamar",
@@ -314,7 +314,9 @@
       ];
 
       for (const type of candidates) {
-        if (window.MediaRecorder && MediaRecorder.isTypeSupported(type)) return type;
+        if (window.MediaRecorder && MediaRecorder.isTypeSupported(type)) {
+          return type;
+        }
       }
 
       return "";
@@ -339,7 +341,9 @@
         audioMimeType = mediaRecorder.mimeType || chosenType || "audio/webm";
 
         mediaRecorder.ondataavailable = event => {
-          if (event.data && event.data.size > 0) audioChunks.push(event.data);
+          if (event.data && event.data.size > 0) {
+            audioChunks.push(event.data);
+          }
         };
 
         mediaRecorder.onstop = () => {
@@ -351,14 +355,16 @@
           preview.classList.remove("hidden");
 
           document.getElementById("clearAudioBtn").disabled = false;
-          document.getElementById("recordingStatus").innerHTML = "Audio recorded. Format: " + audioMimeType;
+          document.getElementById("recordingStatus").innerHTML =
+            "Audio recorded. Format: " + audioMimeType;
         };
 
         mediaRecorder.start();
 
         document.getElementById("startBtn").disabled = true;
         document.getElementById("stopBtn").disabled = false;
-        document.getElementById("recordingStatus").innerHTML = '<span class="recording-dot"></span>Recording...';
+        document.getElementById("recordingStatus").innerHTML =
+          '<span class="recording-dot"></span>Recording...';
         setStatus("Recording audio...");
       } catch (err) {
         let help = "Microphone error: " + err.message + "\n\n";
@@ -429,19 +435,22 @@
 
         const payload = {
           memberName: selectedMember,
-          textReport,
-          audioDataUrl,
-          audioMimeType
+          textReport: textReport,
+          audioDataUrl: audioDataUrl,
+          audioMimeType: audioMimeType
         };
 
-                await fetch(APPS_SCRIPT_URL, {
+        const formData = new FormData();
+        formData.append("payload", JSON.stringify(payload));
+
+        await fetch(APPS_SCRIPT_URL, {
           method: "POST",
           mode: "no-cors",
-          body: JSON.stringify(payload)
+          body: formData
         });
-        
+
         setStatus(
-          "Report submitted.\n\nPlease check Google Drive Inbox to confirm it arrived.",
+          "Report submitted.\n\nCheck Google Drive Inbox to confirm it arrived.",
           "success"
         );
 
